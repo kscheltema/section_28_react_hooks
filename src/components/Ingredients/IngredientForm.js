@@ -6,7 +6,9 @@ import "./IngredientForm.css";
 const IngredientForm = React.memo((props) => {
   const [enteredTitle, setEnteredTitle] = useState("");
   const [enteredAmount, setEnteredAmount] = useState("");
-  //useState always returns (current & update function)
+  //hook rules 1) must be inside functional components or custom hooks
+  //2) must not be inside normal function or if/for aka only on root level
+
   const submitHandler = (event) => {
     event.preventDefault();
   };
