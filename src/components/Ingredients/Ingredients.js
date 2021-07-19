@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 
-import IngredientForm from './IngredientForm';
-import Search from './Search';
+import IngredientForm from "./IngredientForm";
+import Search from "./Search";
 
-function Ingredients() {
+const Ingredients = () => {
   return (
     <div className="App">
       <IngredientForm />
@@ -14,6 +14,6 @@ function Ingredients() {
       </section>
     </div>
   );
-}
+};
 
 export default Ingredients;
