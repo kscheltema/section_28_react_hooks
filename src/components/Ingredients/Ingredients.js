@@ -5,6 +5,7 @@ import Search from "./Search";
 
 const Ingredients = () => {
   const [userIngredients, setUserIngredients] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const filteredIngredientsHandler = useCallback(
     (filteredIngredients) => {
@@ -15,6 +16,7 @@ const Ingredients = () => {
   //setUserIngredients will not cause a rerun, thus an example of an empty dependancy
 
   const addIngredientsHandler = (ingredient) => {
+    setIsLoading(true);
     fetch(
       "https://burgerbuilder-89b34-default-rtdb.firebaseio.com//ingredients.json",
       {
@@ -24,6 +26,7 @@ const Ingredients = () => {
       }
     )
       .then((response) => {
+        setIsLoading(false);
         return response.json();
       })
       .then((responseData) => {
@@ -35,10 +38,12 @@ const Ingredients = () => {
   };
 
   const removeIngredientHandler = (ingredientID) => {
+    setIsLoading(true);
     fetch(
       `https://burgerbuilder-89b34-default-rtdb.firebaseio.com/ingredients/${ingredientID}.json`,
       { method: "DELETE" }
     ).then((response) => {
+      setIsLoading(false);
       setUserIngredients((prevIngredients) =>
         prevIngredients.filter((ingredient) => ingredient.id !== ingredientID)
       );
@@ -47,7 +52,10 @@ const Ingredients = () => {
 
   return (
     <div className="App">
-      <IngredientForm onAddIngredient={addIngredientsHandler} />
+      <IngredientForm
+        onAddIngredient={addIngredientsHandler}
+        loading={isLoading}
+      />
 
       <section>
         <Search onLoadIngredients={filteredIngredientsHandler} />
