@@ -1,9 +1,11 @@
-import React, { useReducer, useCallback } from "react";
+import React, { useReducer, useCallback, useMemo } from "react";
 import IngredientList from "./IngredientList";
 import IngredientForm from "./IngredientForm";
 import ErrorModal from "../UI/ErrorModal";
 import Search from "./Search";
 
+//.useCallback a hook that saves a function
+//useMemo a hook that saves a value
 const ingredientReducer = (currentIngredient, action) => {
   switch (action.type) {
     case "SET":
@@ -86,11 +88,21 @@ const Ingredients = () => {
     dispatchHttp({ type: "CLEAR" });
   };
 
+  const ingredientList = useMemo(() => {
+    return (
+      <IngredientList
+        ingredients={userIngredients}
+        onRemoveItem={removeIngredientHandler}
+      />
+    );
+  }, [userIngredients, removeIngredientHandler]);
+
   return (
     <div className="App">
       {httpState.error && (
         <ErrorModal onClose={clearError}>{httpState.error}</ErrorModal>
       )}
+
       <IngredientForm
         onAddIngredient={addIngredientsHandler}
         loading={httpState.loading}
@@ -98,10 +110,7 @@ const Ingredients = () => {
 
       <section>
         <Search onLoadIngredients={filteredIngredientsHandler} />
-        <IngredientList
-          ingredients={userIngredients}
-          onRemoveItem={removeIngredientHandler}
-        />
+        {ingredientList}
       </section>
     </div>
   );
