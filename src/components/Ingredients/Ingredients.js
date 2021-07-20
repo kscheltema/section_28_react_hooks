@@ -35,11 +35,13 @@ const Ingredients = () => {
   };
 
   const removeIngredientHandler = (ingredientID) => {
-    setUserIngredients((prevIngredients) => {
-      const updatedIngredients = prevIngredients.filter(
-        (ingredient) => ingredient.id !== ingredientID
+    fetch(
+      `https://burgerbuilder-89b34-default-rtdb.firebaseio.com/ingredients/${ingredientID}.json`,
+      { method: "DELETE" }
+    ).then((response) => {
+      setUserIngredients((prevIngredients) =>
+        prevIngredients.filter((ingredient) => ingredient.id !== ingredientID)
       );
-      return updatedIngredients;
     });
   };
 
