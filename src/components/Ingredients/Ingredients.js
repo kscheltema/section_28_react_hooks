@@ -40,17 +40,12 @@ const Ingredients = () => {
     loading: false,
     error: null,
   });
-  // const [userIngredients, setUserIngredients] = useState([]);
-  // const [isLoading, setIsLoading] = useState(false);
-  // const [error, setError] = useState();
 
   const filteredIngredientsHandler = useCallback((filteredIngredients) => {
-    // setUserIngredients(filteredIngredients);
     dispatch({ type: "SET", ingredients: filteredIngredients });
   }, []);
 
-  const addIngredientsHandler = (ingredient) => {
-    // setIsLoading(true);
+  const addIngredientsHandler = useCallback((ingredient) => {
     dispatchHttp({ type: "SEND" });
     fetch(
       "https://burgerbuilder-89b34-default-rtdb.firebaseio.com//ingredients.json",
@@ -61,24 +56,18 @@ const Ingredients = () => {
       }
     )
       .then((response) => {
-        // setIsLoading(false);
         dispatchHttp({ type: "RESPONSE" });
         return response.json();
       })
       .then((responseData) => {
-        // setUserIngredients((prevIngredients) => [
-        //   ...prevIngredients,
-        //   { id: responseData.name, ...ingredient },
-        // ]);
         dispatch({
           type: "ADD",
           ingredient: { id: responseData.name, ...ingredient },
         });
       });
-  };
+  }, []);
 
-  const removeIngredientHandler = (ingredientID) => {
-    // setIsLoading(true);
+  const removeIngredientHandler = useCallback((ingredientID) => {
     dispatchHttp({ type: "SEND" });
     fetch(
       `https://burgerbuilder-89b34-default-rtdb.firebaseio.com/ingredients/${ingredientID}.json`,
@@ -86,18 +75,12 @@ const Ingredients = () => {
     )
       .then((response) => {
         dispatchHttp({ type: "RESPONSE" });
-        // setIsLoading(false);
-        // setUserIngredients((prevIngredients) =>
-        //   prevIngredients.filter((ingredient) => ingredient.id !== ingredientID)
-        // );
         dispatch({ type: "DELETE", id: ingredientID });
       })
       .catch((error) => {
         dispatchHttp({ type: "ERROR", errorMessage: error.message });
-        // setError(error.message);
-        // setIsLoading(false);
       });
-  };
+  }, []);
 
   const clearError = () => {
     dispatchHttp({ type: "CLEAR" });
