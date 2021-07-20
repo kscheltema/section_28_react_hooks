@@ -1,21 +1,34 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useReducer, useCallback } from "react";
 import IngredientList from "./IngredientList";
 import IngredientForm from "./IngredientForm";
 import ErrorModal from "../UI/ErrorModal";
 import Search from "./Search";
 
+const ingredientReducer = (currentIngredient, action) => {
+  switch (action.type) {
+    case "SET":
+      return action.ingredients;
+    case "ADD":
+      return [...currentIngredient, action.ingredient];
+    case "DELETE":
+      return currentIngredient.filter(
+        (ingredientD) => ingredientD.id !== action.id
+      );
+    default:
+      throw new Error("Whoops fatal Error");
+  }
+};
+
 const Ingredients = () => {
-  const [userIngredients, setUserIngredients] = useState([]);
+  const [userIngredients, dispatch] = useReducer(ingredientReducer, []);
+  // const [userIngredients, setUserIngredients] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
 
-  const filteredIngredientsHandler = useCallback(
-    (filteredIngredients) => {
-      setUserIngredients(filteredIngredients);
-    },
-    [setUserIngredients]
-  ); //need to specify al dependancies
-  //setUserIngredients will not cause a rerun, thus an example of an empty dependancy
+  const filteredIngredientsHandler = useCallback((filteredIngredients) => {
+    // setUserIngredients(filteredIngredients);
+    dispatch({ type: "SET", ingredients: filteredIngredients });
+  }, []);
 
   const addIngredientsHandler = (ingredient) => {
     setIsLoading(true);
@@ -32,10 +45,14 @@ const Ingredients = () => {
         return response.json();
       })
       .then((responseData) => {
-        setUserIngredients((prevIngredients) => [
-          ...prevIngredients,
-          { id: responseData.name, ...ingredient },
-        ]);
+        // setUserIngredients((prevIngredients) => [
+        //   ...prevIngredients,
+        //   { id: responseData.name, ...ingredient },
+        // ]);
+        dispatch({
+          type: "ADD",
+          ingredient: { id: responseData.name, ...ingredient },
+        });
       });
   };
 
@@ -47,9 +64,10 @@ const Ingredients = () => {
     )
       .then((response) => {
         setIsLoading(false);
-        setUserIngredients((prevIngredients) =>
-          prevIngredients.filter((ingredient) => ingredient.id !== ingredientID)
-        );
+        // setUserIngredients((prevIngredients) =>
+        //   prevIngredients.filter((ingredient) => ingredient.id !== ingredientID)
+        // );
+        dispatch({ type: "DELETE", id: ingredientID });
       })
       .catch((error) => {
         setError(error.message);
