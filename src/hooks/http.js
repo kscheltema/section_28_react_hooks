@@ -7,7 +7,7 @@ const httpReducer = (curHttpState, action) => {
         loading: true,
         error: null,
         data: null,
-        extra: action.extra,
+        extra: null,
         identifier: action.identifier,
       };
     case "RESPONSE":
@@ -39,7 +39,6 @@ const useHttp = () => {
     (url, method, body, requestExtra, requestIdentifier) => {
       dispatchHttp({
         type: "SEND",
-        extra: requestExtra,
         identifier: requestIdentifier,
       });
       fetch(url, {

@@ -35,7 +35,7 @@ const Ingredients = () => {
   useEffect(() => {
     if (!isLoading && !error && requestIdentifier === "REMOVE_INGREDIENT") {
       dispatch({ type: "DELETE", id: requestExtra });
-    } else if (!isLoading && !error && requestIdentifier) {
+    } else if (!isLoading && !error && requestIdentifier === "ADD_INGREDIENT") {
       dispatch({
         type: "ADD_INGREDIENT",
         ingredient: { id: data.name, ...requestExtra },
