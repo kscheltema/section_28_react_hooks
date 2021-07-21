@@ -30,6 +30,7 @@ const Ingredients = () => {
     sendRequest,
     requestExtra,
     requestIdentifier,
+    clear,
   } = useHttp();
 
   useEffect(() => {
@@ -47,15 +48,18 @@ const Ingredients = () => {
     dispatch({ type: "SET", ingredients: filteredIngredients });
   }, []);
 
-  const addIngredientsHandler = useCallback((ingredient) => {
-    sendRequest(
-      "https://burgerbuilder-89b34-default-rtdb.firebaseio.com//ingredients.json",
-      "POST",
-      JSON.stringify(ingredient),
-      ingredient,
-      "ADD_INGREDIENT"
-    );
-  }, []);
+  const addIngredientsHandler = useCallback(
+    (ingredient) => {
+      sendRequest(
+        "https://burgerbuilder-89b34-default-rtdb.firebaseio.com//ingredients.json",
+        "POST",
+        JSON.stringify(ingredient),
+        ingredient,
+        "ADD_INGREDIENT"
+      );
+    },
+    [sendRequest]
+  );
 
   const removeIngredientHandler = useCallback(
     (ingredientID) => {
@@ -70,8 +74,6 @@ const Ingredients = () => {
     [sendRequest]
   );
 
-  const clearError = useCallback(() => {}, []);
-
   const ingredientList = useMemo(() => {
     return (
       <IngredientList
@@ -83,7 +85,7 @@ const Ingredients = () => {
 
   return (
     <div className="App">
-      {error && <ErrorModal onClose={clearError}>{error}</ErrorModal>}
+      {error && <ErrorModal onClose={clear}>{error}</ErrorModal>}
 
       <IngredientForm
         onAddIngredient={addIngredientsHandler}

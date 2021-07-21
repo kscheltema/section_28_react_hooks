@@ -1,5 +1,13 @@
 import { useReducer, useCallback } from "react";
 
+const initialState = {
+  loading: false,
+  error: null,
+  data: null,
+  extra: null,
+  identifier: null,
+};
+
 const httpReducer = (curHttpState, action) => {
   switch (action.type) {
     case "SEND":
@@ -20,20 +28,15 @@ const httpReducer = (curHttpState, action) => {
     case "ERROR":
       return { loading: false, error: action.errorMessage };
     case "CLEAR":
-      return { ...curHttpState, error: null };
+      return initialState;
     default:
       throw new Error("Whoops fatal Error");
   }
 };
 
 const useHttp = () => {
-  const [httpState, dispatchHttp] = useReducer(httpReducer, {
-    loading: false,
-    error: null,
-    data: null,
-    extra: null,
-    identifier: null,
-  });
+  const [httpState, dispatchHttp] = useReducer(httpReducer, initialState);
+  const clear = useCallback(() => dispatchHttp({ type: "CLEAR" }), []);
 
   const sendRequest = useCallback(
     (url, method, body, requestExtra, requestIdentifier) => {
@@ -72,6 +75,7 @@ const useHttp = () => {
     sendRequest: sendRequest,
     requestExtra: httpState.extra,
     requestIdentifier: httpState.identifier,
+    clear: clear,
   };
 };
 
