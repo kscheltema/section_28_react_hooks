@@ -5,13 +5,12 @@ import ErrorModal from "../UI/ErrorModal";
 import Search from "./Search";
 import useHttp from "../../hooks/http";
 
-//.useCallback a hook that saves a function
-//useMemo a hook that saves a value
 const ingredientReducer = (currentIngredient, action) => {
+  console.log(action);
   switch (action.type) {
     case "SET":
       return action.ingredients;
-    case "ADD":
+    case "ADD_INGREDIENT":
       return [...currentIngredient, action.ingredient];
     case "DELETE":
       return currentIngredient.filter(
@@ -24,40 +23,38 @@ const ingredientReducer = (currentIngredient, action) => {
 
 const Ingredients = () => {
   const [userIngredients, dispatch] = useReducer(ingredientReducer, []);
-  const { isLoading, error, data, sendRequest, requestExtra } = useHttp();
-  // const [httpState, dispatchHttp] = useReducer(httpReducer, {
-  //   loading: false,
-  //   error: null,
-  // });
+  const {
+    isLoading,
+    error,
+    data,
+    sendRequest,
+    requestExtra,
+    requestIdentifier,
+  } = useHttp();
 
   useEffect(() => {
-    dispatch({ type: "DELETE", id: requestExtra });
-  }, [data, requestExtra]);
+    if (!isLoading && !error && requestIdentifier === "REMOVE_INGREDIENT") {
+      dispatch({ type: "DELETE", id: requestExtra });
+    } else if (!isLoading && !error && requestIdentifier) {
+      dispatch({
+        type: "ADD_INGREDIENT",
+        ingredient: { id: data.name, ...requestExtra },
+      });
+    }
+  }, [data, requestExtra, requestIdentifier, isLoading, error]);
 
   const filteredIngredientsHandler = useCallback((filteredIngredients) => {
-    // dispatch({ type: "SET", ingredients: filteredIngredients });
+    dispatch({ type: "SET", ingredients: filteredIngredients });
   }, []);
 
   const addIngredientsHandler = useCallback((ingredient) => {
-    // dispatchHttp({ type: "SEND" });
-    // fetch(
-    //   "https://burgerbuilder-89b34-default-rtdb.firebaseio.com//ingredients.json",
-    //   {
-    //     method: "POST",
-    //     body: JSON.stringify(ingredient),
-    //     headers: { "Content-Type": "application/json" },
-    //   }
-    // )
-    //   .then((response) => {
-    //     dispatchHttp({ type: "RESPONSE" });
-    //     return response.json();
-    //   })
-    //   .then((responseData) => {
-    //     dispatch({
-    //       type: "ADD",
-    //       ingredient: { id: responseData.name, ...ingredient },
-    //     });
-    //   });
+    sendRequest(
+      "https://burgerbuilder-89b34-default-rtdb.firebaseio.com//ingredients.json",
+      "POST",
+      JSON.stringify(ingredient),
+      ingredient,
+      "ADD_INGREDIENT"
+    );
   }, []);
 
   const removeIngredientHandler = useCallback(
@@ -66,15 +63,14 @@ const Ingredients = () => {
         `https://burgerbuilder-89b34-default-rtdb.firebaseio.com/ingredients/${ingredientID}.json`,
         "DELETE",
         null,
-        ingredientID
+        ingredientID,
+        "REMOVE_INGREDIENT"
       );
     },
     [sendRequest]
   );
 
-  const clearError = useCallback(() => {
-    // dispatchHttp({ type: "CLEAR" });
-  }, []);
+  const clearError = useCallback(() => {}, []);
 
   const ingredientList = useMemo(() => {
     return (
