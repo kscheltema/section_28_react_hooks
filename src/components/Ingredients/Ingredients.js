@@ -1,4 +1,4 @@
-import React, { useReducer, useCallback, useMemo } from "react";
+import React, { useReducer, useMemo, useEffect, useCallback } from "react";
 import IngredientList from "./IngredientList";
 import IngredientForm from "./IngredientForm";
 import ErrorModal from "../UI/ErrorModal";
@@ -24,11 +24,15 @@ const ingredientReducer = (currentIngredient, action) => {
 
 const Ingredients = () => {
   const [userIngredients, dispatch] = useReducer(ingredientReducer, []);
-  const { isLoading, error, data, sendRequest } = useHttp();
+  const { isLoading, error, data, sendRequest, requestExtra } = useHttp();
   // const [httpState, dispatchHttp] = useReducer(httpReducer, {
   //   loading: false,
   //   error: null,
   // });
+
+  useEffect(() => {
+    dispatch({ type: "DELETE", id: requestExtra });
+  }, [data, requestExtra]);
 
   const filteredIngredientsHandler = useCallback((filteredIngredients) => {
     // dispatch({ type: "SET", ingredients: filteredIngredients });
@@ -60,7 +64,9 @@ const Ingredients = () => {
     (ingredientID) => {
       sendRequest(
         `https://burgerbuilder-89b34-default-rtdb.firebaseio.com/ingredients/${ingredientID}.json`,
-        "DELETE"
+        "DELETE",
+        null,
+        ingredientID
       );
     },
     [sendRequest]
